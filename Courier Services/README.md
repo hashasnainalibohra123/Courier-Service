@@ -10,78 +10,30 @@ Java Version Should be installed into the system
 Add the following service account as a user to the Github org:
   * User: `hasnainalibohra`
 
-### Create Artifactory Docker
-Go to [Tech Hub](https://tech.optum.com/products/artifactory/create-artifactory-namespace) to create the namespace.
-  * Name: `ewdservices`
-  * User: `ewdworker`
-
-### Create Load Balancers
-
-Go to [Tech Hub](https://tech.optum.com/products/load-balancing/create-load-balancer) and create a load balancer for both Stage and Production.
-
-Stage load balancer: `ewd-file-producer-stage.optum.com`
-
-Production load balancer: `ewd-file-producer-prod.optum.com`
-
-### Create Openshift Projects
-Go to [Tech Hub](https://tech.optum.com/products/openshift/create-osfi-origin-project) and use the Openshift project creation wizard (**Create OSFI Origin Project**) with the following information:  
-
-Be sure to also add `ewdworker` as another Openshift project administrator.
-* NonProd
-  * Cluster: `origin-ctc-core-nonprod.optum.com`
-  * Zone: `core`
-  * Environment: `Non-prod`
-  * Project Name: `ewd-file-producer`
-
-* Stage (CTC)
-  * Datacenter: `ctc`
-  * Zone: `core`
-  * Environment: `Stage`
-  * Project Name: `ewd-file-producer-stage-ctc`
-* Stage (ELR)
-  * Datacenter: `elr`
-  * Zone: `core`
-  * Environment: `Stage`
-  * Project Name: `ewd-file-producer-stage-elr`
-* Prod (CTC)
-  * Datacenter: `ctc`
-  * Zone: `core`
-  * Environment: `Prod`
-  * Project Name: `ewd-file-producer-prod-ctc`
-* Prod (ELR)
-  * Datacenter: `elr`
-  * Zone: `core`
-  * Environment: `Prod`
-  * Project Name: `ewd-file-producer-prod-elr`
-
-### Create Jenkins Openshift project and master
-
-Use [Tech Hub](https://tech.optum.com/) wizards to create a Jenkins project and master server (only if you don't already have a Jenkins server)
-
 # First time configuration
 
 ## Importing into Intellij
 
-The `build.gradle` is configured with the Intellij Idea plugin. Run this command to generate the project files.
+The `maven' is configured with the Intellij Idea plugin. Run this command to generate the project files.
 
 ```
 # Mac
-./gradlew idea openIdea
+mvn clean install
 
 # Windows
-gradlew.bat idea openIdea
+mvn clean install
 ```
 
-When Intellij opens, select `Import Gradle Project` and `Enable Auto-Import`.
+When Intellij opens, select `Import Maven Project` and `Enable Auto-Import`.
 
 ## Building the project
 
 ```
 # Mac
-./gradlew build
+mvn clean install
 
 # Windows
-gradlew.bat build
+mvn clean install
 ```
 
 ## Spotless
@@ -98,29 +50,15 @@ Unit tests are run automatically when the code is built. You can run also them d
 
 ```
 # Mac
-./gradlew test
+mvn test
 
 # Windows
-gradlew.bat test
+mvn test
 ```
-
-Gradle will skip the tests if the code hasn't changed since when you last ran the tests.  
-
-Integration tests can be run with this command.
-
-```
-# Mac
-./gradlew testIntegration
-
-# Windows
-gradlew.bat testIntegration
-```
-
-The integration tests need a running application to test against, it won't start one up and the tests will fail.
 
 ## Running Locally
 
-Most of the time, you will want to build the application into a Docker image and run it with docker compose. This assumes you have previously run `./gradlew build`
+Most of the time, you will want to build the application into a Docker image and run it with docker compose. This assumes you have previously run `mvn clean install`
 
 ```
 docker-compose up --build -d
@@ -132,20 +70,27 @@ Stop the locally running containers with:
 docker-compose down
 ```
 
-Alternatively, to start the application with gradle, you can run
+Alternatively, to start the application with maven, you can run
 
 ```
 # Mac
-./gradlew run
+mvn run
 
 # Windows
-gradlew.bat run
+mvt run
 ```
-
+``````
+Before running  the app please go to the directory Courier-Service\Courier Services
+cd Courier-Service\Courier Services
+``````
 # Deploying
+To deploy into the docker 
+run the following commands 
+docker-compose up -d
+To run in docker instance you need to open the terminal in the docker instance and paste the inputs
 
-Triggering deployments to stage and prod is done with the [GP Scaffold Gradle](https://github.optum.com/gp-optumil/gp-scaffold-gradle) plugin. Run `tasks` to view the **Government Programs Scaffold tasks** that enable control of the pipelines.
-
-```
-./gradlew tasks
-```
+Type this command to run locally the app
+'Checkout the application'
+````
+mvn exec:java -Dexec.mainClass="com.everest.engineering.EverestEngineeringApp"  
+````
