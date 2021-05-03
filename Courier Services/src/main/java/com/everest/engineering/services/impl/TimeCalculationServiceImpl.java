@@ -7,6 +7,8 @@ import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.FindSubPackSet;
 import com.everest.engineering.services.TimeCalculationService;
 import org.apache.logging.log4j.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +29,11 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
 
     List<Double> availabilityList;
 
+    private static Logger LOG = LoggerFactory.getLogger(TimeCalculationServiceImpl.class);
+
     @Override
     public Map <String, Double > calculateTime( CurierJob job ) {
+        LOG.info("Starting TimeCalculationServiceImpl.calculateTime ");
         currentTime = new Double(0);
         availabilityList = new ArrayList<Double>();
         map = new HashMap <String, Double >();
@@ -55,7 +60,7 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
             //sort vehicle list based on availabuly assending order
             Collections.sort(vehicleData.getVehicleList());
         }
-
+        LOG.info("End TimeCalculationServiceImpl.calculateTime ");
         return map;
     }
 
