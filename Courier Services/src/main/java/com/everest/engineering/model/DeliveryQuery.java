@@ -32,9 +32,24 @@ public class DeliveryQuery implements Comparable<DeliveryQuery> {
         return Objects.hash(packageId);
     }
 
+    /**
+     * Returns a deep copy of the DeliveryQuery
+     * @return new instance of {@link DeliveryQuery}
+     */
+    public DeliveryQuery clone() {
+        DeliveryQuery query = new DeliveryQuery();
+
+        query.setOfferCode(this.offerCode);
+        query.setPkgDistance(this.pkgDistance);
+        query.setPkgWeigth(this.pkgWeigth);
+        query.setPackageId(this.packageId);
+
+        return query;
+    }
+
     // Compare DeliveryQuery based on their weight
     @Override
     public int compareTo(DeliveryQuery query) {
-        return this.getPkgWeigth() - query.getPkgWeigth();
+        return this.getPkgDistance() - query.getPkgDistance();
     }
 }

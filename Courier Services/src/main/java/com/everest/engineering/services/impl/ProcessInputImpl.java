@@ -2,6 +2,7 @@ package com.everest.engineering.services.impl;
 
 import com.everest.engineering.model.CurierJob;
 import com.everest.engineering.model.DeliveryQuery;
+import com.everest.engineering.model.Vehicle;
 import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.CostCalculationService;
 import com.everest.engineering.services.ProcessInput;
@@ -56,65 +57,21 @@ public class ProcessInputImpl implements ProcessInput {
             vehicleData.setCount(Integer.parseInt(vehicalDataStr.split(" ")[0]));
             vehicleData.setMaxSpeed(Integer.parseInt(vehicalDataStr.split(" ")[1]));
             vehicleData.setMaxLoad(Integer.parseInt(vehicalDataStr.split(" ")[2]));
+            ArrayList<Vehicle> vehicleList = new ArrayList<Vehicle>();
+            //intitializing the vehicle for history purposes
+            for(int i = 0;i < vehicleData.getCount(); i++)
+            {
+                Vehicle vehicle = new Vehicle();
+                vehicle.setAvailabilityAfter(0);
+                vehicle.setId("Vehicle_"+i);
+                vehicleList.add(vehicle);
+            }
+            Collections.sort(vehicleList);
+            vehicleData.setVehicleList(vehicleList);
             curierJob.setVehicleData(vehicleData);
             //callign the service for
             costCalculationService.calculateCost(curierJob);
 
-        }
-    }
-
-    public static void main(String[] args) {
-        int[] numbers = new int[]{1, 2, 3, 4, 5};
-        List<int[]> allPossibleCombinatiosForNumbers = new ArrayList<>();
-        for (int i = 2; i < numbers.length; i++) {
-            allPossibleCombinatiosForNumbers.addAll(getCombinationsOfNElements(numbers, i));
-        }
-        for (int[] combination : allPossibleCombinatiosForNumbers) {
-            printArray(combination);
-            printArrayIfNumbersSumExpectedValue(combination, 6);
-        }
-    }
-
-
-    private static List<int[]> getCombinationsOfNElements(int[] numbers, int n) {
-        int elementsKnown = n - 1;
-        List<int[]> allCombinationsOfNElements = new ArrayList<>();
-        for (int i = 0; i < numbers.length - elementsKnown; i++) {
-            int[] combination = new int[n];
-            for (int j = 0; j < n; j++) {
-                combination[j] = numbers[i + j];
-            }
-            allCombinationsOfNElements.addAll(generationCombinations(combination, i + elementsKnown, numbers));
-        }
-        return allCombinationsOfNElements;
-    }
-
-    private static List<int[]> generationCombinations(int[] knownElements, int index, int[] numbers) {
-        List<int[]> combinations = new ArrayList<>();
-        for (int i = index; i < numbers.length; i++) {
-            int[] combinationComplete = Arrays.copyOf(knownElements, knownElements.length);
-            combinationComplete[knownElements.length - 1] = numbers[i];
-            combinations.add(combinationComplete);
-        }
-        return combinations;
-    }
-
-    private static void printArray(int[] numbers) {
-        System.out.println();
-        for (int i = 0; i < numbers.length; i++) {
-            System.out.print(numbers[i] + " ");
-        }
-    }
-
-    private static void printArrayIfNumbersSumExpectedValue(int[] numbers, int expectedValue) {
-        int total = 0;
-        for (int i = 0; i < numbers.length; i++) {
-            total += numbers[i];
-        }
-        if (total == expectedValue) {
-            System.out.print("\n ----- Here is a combination you are looking for -----");
-            printArray(numbers);
-            System.out.print("\n -------------------------------");
         }
     }
 }

@@ -2,30 +2,61 @@ package com.everest.engineering.services.impl;
 
 import com.everest.engineering.model.CurierJob;
 import com.everest.engineering.model.DeliveryQuery;
+import com.everest.engineering.model.Vehicle;
 import com.everest.engineering.model.VehicleData;
+import com.everest.engineering.services.FindSubPackSet;
 import com.everest.engineering.services.TimeCalculationService;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeCalculationServiceImpl implements TimeCalculationService {
 
-    Map <String, DeliveryQuery > map;
+    Map <String, Double > map;
+
+    Double currentTime;
+
+    Vehicle currentVehicle;
+
+    @Autowired
+    FindSubPackSet findSubPackSet;
+
+    List<Double> availabilityList;
+
     @Override
-    public String calculateTime( CurierJob job ) {
-        //Sort the queryjobs according to weight
-        TreeSet querySet = new TreeSet<DeliveryQuery>(job.getDeliveryQuery());
-        ArrayList sortedList = new ArrayList();
-        sortedList.addAll(job.getDeliveryQuery());
-        Collections.sort(sortedList);
+    public Map <String, Double > calculateTime( CurierJob job ) {
+        currentTime = new Double(0);
+        availabilityList = new ArrayList<Double>();
+        map = new HashMap <String, Double >();
+        List<DeliveryQuery> deliveryQueryList = job.getDeliveryQuery();
         //get the Vehicle data from the job
         VehicleData vehicleData = job.getVehicleData();
+        Double totalCostTime = new Double(0);
+        //this is the list of packages which need to to accepted by currect vehicle
+        while(deliveryQueryList.size() > 0) {
+            List < DeliveryQuery > itemList = pkgToBeAcceptedByVehicle(vehicleData , deliveryQueryList);
 
-        pkgToBeAcceptedByVehicle(vehicleData,sortedList);
+            Collections.sort(itemList);
+            itemList.stream().forEach(ele -> {
+                //calculating the max time
+                double timeCalculated =  (double) ele.getPkgDistance() / (double) vehicleData.getMaxSpeed();
+                map.put(ele.getPackageId(),currentTime + timeCalculated);
+                //add this time to availability list so that this vehicle will be availble fron that list
+            });
 
-        return Strings.EMPTY;
+            //add this time to availability list so that this vehicle will be availble fron that list
+            currentVehicle.setAvailabilityAfter((((double)itemList.get(itemList.size()-1).getPkgDistance()/(double) vehicleData.getMaxSpeed())*2) + currentVehicle.getAvailabilityAfter());
+            //delete the package what is processed
+            deliveryQueryList.removeAll(itemList);
+            //sort vehicle list based on availabuly assending order
+            Collections.sort(vehicleData.getVehicleList());
+        }
+
+        return map;
     }
 
     List <DeliveryQuery> pkgToBeAcceptedByVehicle(VehicleData vehicleData, List sortedList){
@@ -36,7 +67,16 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
                 int vehicleCount = vehicleData.getCount();
                 //pick the vehicle
                 vehicleData.setCount(vehicleCount - 1);
-                List deliveryList = pickThePckg(vehicleData, sortedList);
+                currentVehicle = vehicleData.getVehicleList().iterator().next();
+                return pickThePckg(vehicleData , sortedList);
+            } else
+            {
+                //check the availibilitylist
+                double availability  = vehicleData.getVehicleList().iterator().next().getAvailabilityAfter() - currentTime;
+                currentTime = currentTime + availability;
+                currentVehicle = vehicleData.getVehicleList().iterator().next();
+
+                return pickThePckg(vehicleData , sortedList);
             }
         }
         return Collections.emptyList();
@@ -50,6 +90,10 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
         Iterator<DeliveryQuery> iterator = sortedList.iterator();
         List<DeliveryQuery> resultantList = new ArrayList<DeliveryQuery>();
         Integer current = 0;
+        if(sortedList.size()  == 1)
+        {
+            return sortedList;
+        }
         while(iterator.hasNext() ) {
             DeliveryQuery queryObj = iterator.next();
             countElementSubSetWeight = countElementSubSetWeight + queryObj.getPkgWeigth();
@@ -57,18 +101,31 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
                 pkgCount++;
             }
             else{
-                for(int index = pkgCount-1; index > -1 ; index--){
-
-                }
+                List<List<DeliveryQuery>> resultantList1 = findSubPackSet.subsets(sortedList, vehicleData, pkgCount);
+                int finalPkgCount = pkgCount;
+                List<List<DeliveryQuery>> resultantListWithExactSize = resultantList1.parallelStream().filter(ele -> {
+                   return ele.size() == finalPkgCount;
+                }).collect(Collectors.toList());
+                Collections.sort(resultantListWithExactSize, new ListOfListComparator<>());
+                resultantList = resultantListWithExactSize.get(resultantListWithExactSize.size()-1);
                 break;
             }
         }
-        //total max count for the packages for vehicle
-        int size = resultantList.size();
-        resultantList.clear();
-        //logic to pick up the packages
+        return resultantList;
+    }
+}
 
 
-        return Collections.emptyList();
+class ListOfListComparator<T extends Comparable<DeliveryQuery>> implements Comparator<List<DeliveryQuery>> {
+
+    @Override
+    public int compare(List<DeliveryQuery> o1, List<DeliveryQuery> o2) {
+        for (int i = 0; i < Math.min(o1.size(), o2.size()); i++) {
+            int c = o1.get(i).getPkgWeigth().compareTo(o2.get(i).getPkgWeigth());
+            if (c != 0) {
+                return c;
+            }
+        }
+        return Integer.compare(o1.size(), o2.size());
     }
 }

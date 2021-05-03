@@ -15,9 +15,9 @@ public enum CustomeOffer {
     OFR001("OFR001", Integer.valueOf(10),
             new Distance(201,Integer.MAX_VALUE),new Weight(70,200),"Offer code OFR001 for distance greter then 200"),
     OFR002("OFR002",  Integer.valueOf(7),
-            new Distance(50,150),new Weight(100,250),"Offer code OFR001 for distance greter then 200"),
+            new Distance(50,150),new Weight(100,250),"Offer code OFR002 for distance greter then 50 and less then 150"),
     OFR003("OFR003",  Integer.valueOf(5),
-            new Distance(50,250),new Weight(10,150),"Offer code OFR001 for distance greter then 200");
+            new Distance(50,250),new Weight(10,150),"Offer code OFR003 for distance greter then 50 and less then 250");
 
     private String id;
     private String description;
@@ -39,7 +39,7 @@ public enum CustomeOffer {
         return map.get(id);
     }
 
-    CustomeOffer( String id, Integer discount, Distance distance, Weight weight, String description ) {
+    CustomeOffer( String id , Integer discount , Distance distance , Weight weight , String description ) {
         this.id = id;
         this.dicount = discount;
         this.distance = distance;

@@ -8,6 +8,11 @@ import com.everest.engineering.services.TimeCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @Service
 public class CostCalculationServiceImpl implements CostCalculationService {
     private final String SPACE = " ";
@@ -17,14 +22,19 @@ public class CostCalculationServiceImpl implements CostCalculationService {
 
     public void calculateCost( CurierJob job ){
         Integer baseDeliveryCost = job.getBaseDeliveryCost();
-        Integer totalItemsToBeDelivered = job.getNoOfPackages();
-        String time = timeCalculationService.calculateTime(job);
-        for(DeliveryQuery query : job.getDeliveryQuery()){
+
+        //copy of the jobs
+        List<DeliveryQuery> originalList = job.getDeliveryQuery().stream().map(query -> query.clone()).collect(Collectors.toList());
+        Map <String, Double > timeMap = timeCalculationService.calculateTime(job);
+
+        for(DeliveryQuery query : originalList){
             int dicountAccepted = getDiscount(query);
             Integer totalCost = calculateTotalCost(query,baseDeliveryCost);
             int dicountPrice = (dicountAccepted * totalCost)/100;
-
-            System.out.println(query.getPackageId() + SPACE + dicountPrice + SPACE + (totalCost - dicountPrice));
+            //priting of data
+            System.out.print(query.getPackageId() + SPACE + dicountPrice + SPACE + (totalCost - dicountPrice) + SPACE);
+            System.out.printf(" %.2f",timeMap.get(query.getPackageId()));
+            System.out.println();
         }
     }
 
@@ -36,6 +46,10 @@ public class CostCalculationServiceImpl implements CostCalculationService {
 
     private int getDiscount( DeliveryQuery query ) {
         CustomeOffer offerCodeDetails = CustomeOffer.findById(query.getOfferCode());
+        if(Objects.isNull(offerCodeDetails))
+        {
+            return 0;
+        }
         //offer calculation
         //checking the offer distance boundaries
         boolean checkDistanceAssert = false, checkWeightAssert = false;
@@ -48,11 +62,11 @@ public class CostCalculationServiceImpl implements CostCalculationService {
         if(offerCodeDetails.getWeight().getLowerLimit() <=   query.getPkgWeigth() &&
                 offerCodeDetails.getWeight().getUpperLimit() >= query.getPkgWeigth())
         {
-            checkDistanceAssert = true;
+            checkWeightAssert = true;
         }
 
         //if both condtioned meet then return the discount
-        if(checkDistanceAssert && checkDistanceAssert)
+        if(checkDistanceAssert && checkWeightAssert)
         {
             return offerCodeDetails.getDicount();
         }
