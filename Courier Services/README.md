@@ -1,6 +1,7 @@
 # What Does This Repository Do?
 
 This repository creates a Java library and an Single Stand Java Application.
+This is  the courier service application which detetmine the cost to deliver the package inclusing coupons.
 
 # Prereqs to run
 
