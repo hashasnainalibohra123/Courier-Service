@@ -2,25 +2,14 @@ package com.everest.engineering;
 
 import com.everest.engineering.model.Distance;
 import com.everest.engineering.model.Weight;
-import com.everest.engineering.offer.CustomeOffer;
 import com.everest.engineering.offer.DynamicOffer;
 import com.everest.engineering.offer.OfferData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class offerExtensibilityTest {
-
-    @Test
-    void testOfferNullabilityTest() {
-        CustomeOffer offer = CustomeOffer.findById("XYZ");
-        Assert.isNull(offer);
-        CustomeOffer offer1 = CustomeOffer.findById("NA");
-        Assert.isNull(offer1);
-    }
 
     @Test
     void testOfferExtensibility() {

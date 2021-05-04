@@ -4,27 +4,19 @@ import com.everest.engineering.model.CurierJob;
 import com.everest.engineering.model.DeliveryQuery;
 import com.everest.engineering.model.Vehicle;
 import com.everest.engineering.model.VehicleData;
-import com.everest.engineering.services.FindSubPackSet;
 import com.everest.engineering.services.TimeCalculationService;
+import com.everest.engineering.services.impl.TimeCalculationServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@RunWith(SpringJUnit4ClassRunner.class)
+
 public class TimeCalculatonServiceTest {
 
-    @Autowired
     TimeCalculationService timeCalculationService;
     List < DeliveryQuery > listOfDeliveries;
     CurierJob job;
@@ -32,6 +24,7 @@ public class TimeCalculatonServiceTest {
     @BeforeEach
     public void beforeBPM()
     {
+        timeCalculationService = new TimeCalculationServiceImpl();
         VehicleData vehicleData = VehicleData.builder().count(3).maxLoad(200).maxSpeed(70).build();
         List < Vehicle > vehicleList = new ArrayList <>();
         Vehicle vehicle1 = Vehicle.builder().availabilityAfter(0).id("1").build();

@@ -3,12 +3,13 @@ package com.everest.engineering.services.impl;
 import com.everest.engineering.model.DeliveryQuery;
 import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.FindSubPackSet;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Service
 public class FindSubPackSetImpl implements FindSubPackSet {
 
     private static Map <String,List<DeliveryQuery>> subSet = new HashMap <>();

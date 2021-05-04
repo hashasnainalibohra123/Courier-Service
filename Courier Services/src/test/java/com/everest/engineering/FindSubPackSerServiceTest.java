@@ -3,31 +3,24 @@ package com.everest.engineering;
 import com.everest.engineering.model.DeliveryQuery;
 import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.FindSubPackSet;
+import com.everest.engineering.services.impl.FindSubPackSetImpl;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@RunWith(SpringJUnit4ClassRunner.class)
 public class FindSubPackSerServiceTest {
 
-    @Autowired
     FindSubPackSet findSubPackSetService;
     List < DeliveryQuery > listOfDeliveries;
 
     @BeforeEach
     public void beforeBPM()
     {
+        findSubPackSetService = new FindSubPackSetImpl();
         listOfDeliveries = new ArrayList <>();
         DeliveryQuery delveryQuery1 = DeliveryQuery.builder().pkgWeigth(50).build();
         DeliveryQuery delveryQuery2 = DeliveryQuery.builder().pkgWeigth(75).build();

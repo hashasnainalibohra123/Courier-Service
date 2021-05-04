@@ -1,17 +1,13 @@
 package com.everest.engineering.services.impl;
 
-import com.everest.engineering.EverestEngineeringApp;
 import com.everest.engineering.model.CurierJob;
 import com.everest.engineering.model.DeliveryQuery;
-import com.everest.engineering.offer.CustomeOffer;
 import com.everest.engineering.offer.DynamicOffer;
 import com.everest.engineering.offer.OfferData;
 import com.everest.engineering.services.CostCalculationService;
 import com.everest.engineering.services.TimeCalculationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,16 +15,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
 public class CostCalculationServiceImpl implements CostCalculationService {
     private final String SPACE = " ";
-    private static Logger LOG = LoggerFactory.getLogger(CostCalculationServiceImpl.class);
-    @Autowired
+    private static Logger LOG = LogManager.getLogger(CostCalculationServiceImpl.class);
+
     TimeCalculationService timeCalculationService;
 
     public void calculateCost( CurierJob job ){
+        timeCalculationService  = new TimeCalculationServiceImpl();
         Integer baseDeliveryCost = job.getBaseDeliveryCost();
-        LOG.info("Starting CostCalculationServiceImpl.calculateCost ");
+        LOG.debug("Starting CostCalculationServiceImpl.calculateCost ");
         //copy of the jobs
         List<DeliveryQuery> originalList = job.getDeliveryQuery().stream().map(query -> query.clone()).collect(Collectors.toList());
         Map <String, Double > timeMap = timeCalculationService.calculateTime(job);
@@ -42,7 +38,7 @@ public class CostCalculationServiceImpl implements CostCalculationService {
             System.out.printf(" %.2f",timeMap.get(query.getPackageId()));
             System.out.println();
         }
-        LOG.info("End CostCalculationServiceImpl.calculateCost ");
+        LOG.debug("End CostCalculationServiceImpl.calculateCost ");
     }
 
     private Integer calculateTotalCost( DeliveryQuery query , Integer baseDeliveryCost ) {
@@ -83,7 +79,6 @@ public class CostCalculationServiceImpl implements CostCalculationService {
         {
             LOG.error("Error in CostCalculationServiceImpl.calculateCost.getDiscount "+exception.getMessage());
         }
-
         return 0;
     }
 }

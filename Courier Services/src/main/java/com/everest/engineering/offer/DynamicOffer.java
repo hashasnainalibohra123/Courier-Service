@@ -2,19 +2,12 @@ package com.everest.engineering.offer;
 
 import com.everest.engineering.model.Distance;
 import com.everest.engineering.model.Weight;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class DynamicOffer implements Cloneable, Serializable {
     private static final long serialVersionUID = 1007236647121448027L;
     public Map <String, OfferData> map = new HashMap <>();

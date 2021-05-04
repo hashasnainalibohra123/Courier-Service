@@ -6,16 +6,14 @@ import com.everest.engineering.model.Vehicle;
 import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.FindSubPackSet;
 import com.everest.engineering.services.TimeCalculationService;
-import org.apache.logging.log4j.util.Strings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
 public class TimeCalculationServiceImpl implements TimeCalculationService {
 
     Map <String, Double > map;
@@ -24,18 +22,18 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
 
     Vehicle currentVehicle;
 
-    @Autowired
     FindSubPackSet findSubPackSet;
 
     List<Double> availabilityList;
 
-    private static Logger LOG = LoggerFactory.getLogger(TimeCalculationServiceImpl.class);
+    private static Logger LOG = LogManager.getLogger(TimeCalculationServiceImpl.class);
 
     @Override
     public Map <String, Double > calculateTime( CurierJob job ) {
-        LOG.info("Starting TimeCalculationServiceImpl.calculateTime ");
+        LOG.debug("Starting TimeCalculationServiceImpl.calculateTime ");
         currentTime = new Double(0);
         availabilityList = new ArrayList<Double>();
+        findSubPackSet = new FindSubPackSetImpl();
         map = new HashMap <String, Double >();
         List<DeliveryQuery> deliveryQueryList = job.getDeliveryQuery();
         //get the Vehicle data from the job
@@ -48,7 +46,7 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
             Collections.sort(itemList);
             itemList.stream().forEach(ele -> {
                 //calculating the max time
-                double timeCalculated =  (double) ele.getPkgDistance() / (double) vehicleData.getMaxSpeed();
+                double timeCalculated =  roundDouble(ele.getPkgDistance()) /roundDouble(vehicleData.getMaxSpeed());
                 map.put(ele.getPackageId(),currentTime + timeCalculated);
                 //add this time to availability list so that this vehicle will be availble fron that list
             });
@@ -60,7 +58,7 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
             //sort vehicle list based on availabuly assending order
             Collections.sort(vehicleData.getVehicleList());
         }
-        LOG.info("End TimeCalculationServiceImpl.calculateTime ");
+        LOG.debug("End TimeCalculationServiceImpl.calculateTime ");
         return map;
     }
 
@@ -117,6 +115,12 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
             }
         }
         return resultantList;
+    }
+
+    private double roundDouble(double d) {
+        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
+        bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+        return bigDecimal.doubleValue();
     }
 }
 

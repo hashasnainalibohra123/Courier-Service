@@ -5,7 +5,8 @@ This is  the courier service application which detetmine the cost to deliver the
 
 # Prereqs to run
 
-Java Version Should be installed into the system
+1. Java Version Should be installed into the system
+2. Docker installed for deployment
 
 ### Github User
 Add the following service account as a user to the Github org:
@@ -37,14 +38,6 @@ mvn clean install
 mvn clean install
 ```
 
-## Spotless
-
-[Spotless](https://github.com/diffplug/spotless) automatically keeps your code formatted. Currently is is configured to use the [Google Java Format](https://github.com/google/google-java-format).
-
-There is an Intellij plugin called [google-java-format](https://plugins.jetbrains.com/plugin/8527-google-java-format/) that you can install to have Intellij match the format too.
-
-Running a build will automatically format the code. The pipeline is set up to fail the build if the Spotless check fails too.
-
 ## Running tests
 
 Unit tests are run automatically when the code is built. You can run also them directly with
@@ -58,7 +51,32 @@ mvn test
 ```
 
 ## Running Locally
+```mvn exec:java -Dexec.mainClass="com.everest.engineering.EverestEngineeringApp" ```
 
+Alternatively, to start the application with maven, you can run
+
+```
+# Mac
+mvn run
+
+# Windows
+mvn run
+```
+``````
+Before running  the app please go to the directory Courier-Service\Courier Services
+cd Courier-Service\Courier Services
+``````
+# Deploying
+###1. Build the package :-
+Run  the following command in the directory Courier-Service\Courier Services
+```
+mvn clean package
+```
+Build the Docker app 
+```
+docker build -t courierservices:1.0-SNAPSHOT .
+
+```
 Most of the time, you will want to build the application into a Docker image and run it with docker compose. This assumes you have previously run `mvn clean install`
 
 ```
@@ -71,20 +89,6 @@ Stop the locally running containers with:
 docker-compose down
 ```
 
-Alternatively, to start the application with maven, you can run
-
-```
-# Mac
-mvn run
-
-# Windows
-mvt run
-```
-``````
-Before running  the app please go to the directory Courier-Service\Courier Services
-cd Courier-Service\Courier Services
-``````
-# Deploying
 To deploy into the docker 
 run the following commands 
 docker-compose up -d

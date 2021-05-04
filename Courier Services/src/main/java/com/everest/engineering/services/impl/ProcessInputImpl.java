@@ -6,22 +6,21 @@ import com.everest.engineering.model.Vehicle;
 import com.everest.engineering.model.VehicleData;
 import com.everest.engineering.services.CostCalculationService;
 import com.everest.engineering.services.ProcessInput;
-import com.everest.engineering.services.TimeCalculationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 
-@Service
 public class ProcessInputImpl implements ProcessInput {
 
-    @Autowired
     CostCalculationService costCalculationService;
 
     VehicleData vehicleData;
 
     public void processInput()
     {
+        costCalculationService = new CostCalculationServiceImpl();
         Scanner in = new Scanner(System.in);
         while(true)
         {
