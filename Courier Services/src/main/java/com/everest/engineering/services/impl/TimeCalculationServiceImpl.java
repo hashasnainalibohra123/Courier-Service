@@ -62,40 +62,39 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
         return map;
     }
 
-    List <DeliveryQuery> pkgToBeAcceptedByVehicle(VehicleData vehicleData, List sortedList){
+    List <DeliveryQuery> pkgToBeAcceptedByVehicle(VehicleData vehicleData, List availableDeliveryQueryList){
         //result will be added in the map
-        while (sortedList.size() > 0) {
+        while (availableDeliveryQueryList.size() > 0) {
             //check if vehicle available
             if(vehicleData.getCount() > 0) {
                 int vehicleCount = vehicleData.getCount();
                 //pick the vehicle
                 vehicleData.setCount(vehicleCount - 1);
                 currentVehicle = vehicleData.getVehicleList().iterator().next();
-                return pickThePckg(vehicleData , sortedList);
+                return pickThePckg(vehicleData , availableDeliveryQueryList);
             } else
             {
                 //check the availibilitylist
                 double availability  = vehicleData.getVehicleList().iterator().next().getAvailabilityAfter() - currentTime;
                 currentTime = currentTime + availability;
                 currentVehicle = vehicleData.getVehicleList().iterator().next();
-
-                return pickThePckg(vehicleData , sortedList);
+                return pickThePckg(vehicleData , availableDeliveryQueryList);
             }
         }
         return Collections.emptyList();
     }
 
-    private List pickThePckg( VehicleData vehicleData , List sortedList ) {
+    private List pickThePckg( VehicleData vehicleData , List availbleQueryList ) {
         //logic to get the package list based on the available querySet
         int countElementSubSetWeight = 0;
         int pkgCount = 0;
         //find the maximun element in the pickup list
-        Iterator<DeliveryQuery> iterator = sortedList.iterator();
+        Iterator<DeliveryQuery> iterator = availbleQueryList.iterator();
         List<DeliveryQuery> resultantList = new ArrayList<DeliveryQuery>();
         Integer current = 0;
-        if(sortedList.size()  == 1)
+        if(availbleQueryList.size()  == 1)
         {
-            return sortedList;
+            return availbleQueryList;
         }
         while(iterator.hasNext() ) {
             DeliveryQuery queryObj = iterator.next();
@@ -104,7 +103,7 @@ public class TimeCalculationServiceImpl implements TimeCalculationService {
                 pkgCount++;
             }
             else{
-                List<List<DeliveryQuery>> resultantList1 = findSubPackSet.subsets(sortedList, vehicleData, pkgCount);
+                List<List<DeliveryQuery>> resultantList1 = findSubPackSet.subsets(availbleQueryList, vehicleData, pkgCount);
                 int finalPkgCount = pkgCount;
                 List<List<DeliveryQuery>> resultantListWithExactSize = resultantList1.parallelStream().filter(ele -> {
                    return ele.size() == finalPkgCount;
